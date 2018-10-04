@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block page_content %}
+
+{% for edudaily in edudailys.items %}
+<div class="jumbotron">
+  <img class="img-thumbnail rounded-circle float-left" src="/static/{{ edudaily.user.icon }}" alt="{{ edudaily.user.icon }}" style='padding:0;margin:0 15px 15px 0;' width="120" height="80">
+  <h2 class="display-4">{{ edudaily.title }}</h2>
+  <p>{{ edudaily.user.name }}</p>
+  <p>更新日時 : {{ edudaily.updated_at }}</p>
+  <p class="lead">
+    <a class="btn btn-primary btn-lg float-right" href="{{ url_for('show_edu_daily', uid=edudaily.id) }}" role="button">続きを読む</a>
+  </p>
+</div>
+{% else %}
+  <p>投稿がありません</p>
+{% endfor %}
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+    {% if prev_url %}
+    <li class="page-item"><a class="page-link" href="{{ prev_url }}">Previous</a></li>
+    {% endif %}
+    {%- for page in edudailys.iter_pages() %}
+      {% if page %}
+        {% if page != edudailys.page %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('index', page=page) }}">{{ page }}</a>
+        </li>
+        {% else %}
+        <li class="page-item active">
+          <a class="page-link">{{ page }}<span class="sr-only">(current)</span></a>
+        </li>
+        {% endif %}
+        {% else %}
+        <span class=ellipsis>…</span>
+      {% endif %}
+    {%- endfor %}
+    {% if next_url %} 
+    <li class="page-item"><a class="page-link" href="{{ next_url }}">Next</a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endblock %}

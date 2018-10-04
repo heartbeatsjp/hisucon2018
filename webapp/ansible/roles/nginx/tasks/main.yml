@@ -1,0 +1,36 @@
+---
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: present
+
+- name: install nginx
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - nginx
+
+- name: copy nginx.conf
+  copy:
+    src: nginx.conf
+    dest: /etc/nginx
+    owner: root
+    group: root
+  notify:
+    restart nginx
+
+- name: start nginx and set auto start
+  systemd:
+    state: started
+    name: nginx
+    enabled: yes
+
+- name: FW HTTP
+  firewalld:
+    service: http
+    permanent: true
+    immediate: true
+    state: enabled
+
+# vim:ft=ansible:

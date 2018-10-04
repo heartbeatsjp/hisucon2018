@@ -1,0 +1,116 @@
+---
+- name: set fastestmirror only JP
+  lineinfile:
+    dest=/etc/yum/pluginconf.d/fastestmirror.conf
+    backup=true
+    state=present
+    line={{ item }}
+  with_items:
+    - 'include_only=.jp'
+
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: present
+
+- name: update all packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: install base packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "@Base"
+    - "@Compatibility libraries"
+    - "@Additional Development"
+    - "@Development tools"
+    - "@System administration tools"
+    - "@System Management"
+
+- name: install other packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - bind-utils
+    - dstat
+    - ftp
+    - git
+    - jwhois
+    - lsof
+    - mailx
+    - man
+    - psacct
+    - sysstat
+    - tcpdump
+    - telnet
+    - tmux
+    - nmap
+    - vim
+    - wget
+    - yum-plugin-fastestmirror
+
+- name: set PS1 at /etc/bashrc
+  lineinfile:
+    dest=/etc/bashrc
+    backup=true
+    state=present
+    line={{ item }}
+  with_items:
+    - 'PS1="\[\e[37m\e[44m\[HISUCON2018[\u@\h \W \d \t]\[\e[0m\]\n\\$ "'
+
+- name: user add
+  user:
+    name: "{{item.name}}"
+    state: present
+    password: "{{item.password}}"
+  with_items: "{{users}}"
+  tags: users
+
+- name: mkdir ~/.ssh
+  file:
+    path: "/home/{{item.name}}/.ssh"
+    state: directory
+    owner: "{{item.name}}"
+    group: "{{item.name}}"
+    mode: 0700
+  with_items: "{{users}}"
+  tags: users
+
+- name: Set authorized_key
+  authorized_key:
+    user: "{{item.name}}"
+    state: present
+    key: "{{item.authorizedkey}}"
+  with_items: "{{users}}"
+  tags: users
+
+- name: sudo configured
+  copy:
+    src: "{{item.name}}"
+    dest: "/etc/sudoers.d/"
+    owner: root
+    group: root
+    mode: 0440
+  with_items: "{{users}}"
+  tags: users
+
+- name: disable SELinux
+  selinux:
+    state: disabled
+
+- name: set timezone to Asia/Tokyo
+  timezone:
+    name: Asia/Tokyo
+
+- name: copy ifcfg-eth1
+  copy:
+    src: "ifcfg-eth1"
+    dest: "/etc/sysconfig/network-scripts/"
+    owner: root
+    group: root
+
+# vim:ft=ansible:

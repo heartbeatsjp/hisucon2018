@@ -1,0 +1,30 @@
+{{ define "ajax" }}
+
+<script type="text/javascript">
+$(function(){
+  $(".progress").hide();
+  $('#test').on('click',function(){
+                  $.ajax({
+                    url:'{{ .url }}',
+                    type:'GET'
+
+                })
+                // Ajaxリクエストが成功した時発動
+                .done( (data) => {
+                    console.log(data);
+                    alert("ベンチマーク実行キューに追加しました。");
+                })
+                // Ajaxリクエストが失敗した時発動
+                .fail( (data) => {
+                    console.log(data);
+                    alert("ベンチマーク実行キューに追加に失敗しました。再度リトライをお願いします。");
+                })
+                // Ajaxリクエストが成功・失敗どちらでも発動
+                .always( (data) => {
+
+                });
+            });
+        });
+
+</script>
+{{ end }}

@@ -1,0 +1,29 @@
+---
+- name: copy systemd
+  copy:
+    src: hisucon2018-portal.service
+    dest: "/etc/systemd/system/"
+  notify:
+    restart hisucon2018-portal
+
+- name: copy webapp
+  synchronize:
+    src: webapp
+    dest: "/srv/"
+  notify:
+    restart hisucon2018-portal
+
+- name: start hisucon2018-portal.service and set auto start
+  systemd:
+    state: started
+    name: hisucon2018-portal.service
+    enabled: yes
+
+- name: FW HTTP 
+  firewalld:
+    service: http
+    permanent: true
+    immediate: true
+    state: enabled
+
+# vim:ft=ansible:

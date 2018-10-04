@@ -1,0 +1,128 @@
+{% extends "base.html" %} {% block scripts %} {{ super() }}
+<script>
+  $(function () {
+    var viewModel = {
+      numberOfStar: ko.observable("{{ edudaily.star }}"),
+    };
+    ko.applyBindings(viewModel);
+    $('#star').click(function () {
+      $.ajax({
+        url: "{{ url_for('countup', id=edudaily.id) }}",
+        contentType: 'application/json;charset=UTF-8',
+        type: 'POST'
+      }).done(function (data) {
+        viewModel.numberOfStar(data.value);
+      });
+    })
+
+    $('.starcom').click(function () {
+      $.ajax({
+        url: '/edudaily/' + $(this).attr('id') + '/countup_com',
+        contentType: 'application/json;charset=UTF-8',
+        type: 'POST',
+        context: $(this).attr('id')
+      }).done(function (data) {
+        $('#' + this).children().text(data.value)
+      });
+    })
+  });
+</script> {% endblock scripts %} {% block page_content %}
+<div class="jumbotron">
+  <img class="img-thumbnail rounded-circle float-left" src="/static/{{ edudaily.user.icon }}" alt="{{ edudaily.user.icon }}"
+    style='padding:0;margin:0 15px 15px 0;' width="120" height="80">
+  <h2 class="display-4">{{ edudaily.title }}</h2>
+  <p>{{ edudaily.user.name }}</p>
+  <p class='clearfix'></p>
+  {{ text }}
+  <hr class="my-4"> 投稿日時 : {{ edudaily.created_at }}
+  <br> 更新日時 : {{ edudaily.updated_at }}
+  <br>
+  <div class="btn-toolbar float-right">
+    <form action="{{ url_for('new_com', id=edudaily.id) }}" method="GET">
+      <button type="submit" class="btn btn-success" style="margin-left: 5px">コメント</button>
+    </form>
+    {% if current_user.get_id() == edudaily.user_id %}
+    <form action="{{ url_for('edit', id=edudaily.id) }}" method="GET">
+      <button type="submit" class="btn btn-primary" style="margin-left: 5px">編集</button>
+    </form>
+    <form action="{{ url_for('delete', id=edudaily.id) }}" method="POST">
+      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#e{{ edudaily.id }}" style="margin-left: 5px">削除</button>
+      <div class="modal fade" id="e{{ edudaily.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">確認</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              本当に削除しますか？
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+              <button type="submit" class="btn btn-danger" style="margin-left: 5px">削除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    {% endif %}
+  </div>
+  <br>
+  <ul class="list-inline float-left">
+    <button id=star class="fa fa-star btn btn-warning">
+      <span data-bind="text: numberOfStar"></span>
+    </button>
+  </ul>
+</div>
+<div class="card">
+  {% for edudailycomment in edudailycomments %}
+  <img class="rounded-circle float-left" src="/static/{{ iconlist[loop.index0] }}" alt="{{ iconlist[loop.index0] }}" width="60"
+    height="60">
+  <p>{{ name_list[loop.index0] }}</p>
+  <div class="card-body">
+    <p class="card-text">{{ commentlist[loop.index0] }}</p>
+    <div class="card-footer text-muted">
+      投稿日時 : {{ edudailycomment.created_at }}
+      <br> 更新日時 : {{ edudailycomment.updated_at }}
+      <br>
+    </div>
+    <button id="{{ edudailycomment.id }}" class="fa fa-star btn btn-warning starcom">
+      <span>{{ edudailycomment.star }}</span>
+    </button>
+    {% if current_user.get_id() == edudailycomment.commenter_id %}
+    <div class="btn-toolbar float-right">
+      <form action="{{ url_for('edit_com', id=edudailycomment.id) }}" method="GET">
+        <button type="submit" class="btn btn-primary" style="margin-left: 5px">編集</button>
+      </form>
+      <form action="{{ url_for('delete_com', id=edudailycomment.id) }}" method="POST">
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#ec{{ edudailycomment.id }}" style="margin-left: 5px">削除</button>
+        <div class="modal fade" id="ec{{ edudailycomment.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">確認</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                本当に削除しますか？
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                <button type="submit" class="btn btn-danger" style="margin-left: 5px">削除</button>
+              </div>
+            </div>
+      </form>
+      </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% else %}
+  <h3>コメントはありません</h3>
+  {% endfor %}
+</div>
+{% endblock %}

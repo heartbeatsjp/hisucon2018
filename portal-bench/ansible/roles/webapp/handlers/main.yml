@@ -1,0 +1,6 @@
+---
+- name: restart hisucon2018-portal
+  systemd:
+    name: hisucon2018-portal
+    daemon_reload: yes
+    state: restarted

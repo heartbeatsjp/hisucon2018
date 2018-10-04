@@ -1,0 +1,7 @@
+---
+- name: restart hisucon2018-webapp
+  systemd:
+    name: hisucon2018-webapp
+    daemon_reload: yes
+    state: restarted
+

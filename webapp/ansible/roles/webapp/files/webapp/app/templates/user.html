@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<h1>ユーザ情報</h1>
+<div class="jumbotron">
+  <img class="rounded-circle float-left" src="/static/{{ icon }}" alt="{{ icon }}" style='padding:0;margin:0 15px 15px 0;' width="120" height="120">
+  <table class="table">
+    <thead class="table table-striped">
+      <tr>
+        <th scope="col">ユーザ名</th>
+        <th scope="col">管理者</th>
+        <th scope="col">作成日</th>
+        <th scope="col">更新日</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ current_user.get_name() }}</td>
+        {% if current_user.get_admin() %}
+        <td>◯</td>
+        {% else %}
+        <td>☓</td>
+        {% endif %}
+        <td>{{ current_user.get_created_at() }}</td>
+        <td>{{ current_user.get_updated_at() }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><a class="btn btn-primary btn-lg float-right" href="{{ url_for('useredit') }}" role="button">更新</a></p>
+</div>
+<h1>個人記事一覧</h1>
+{% for edudaily in current_user_edudaily %}
+<div class="jumbotron">
+  <h2 class="display-4">{{ edudaily.title }}</h2>
+  <p>更新日時 : {{ edudaily.updated_at }}</p>
+  <p class="lead">
+    <a class="btn btn-primary btn-lg float-right" href="{{ url_for('show_edu_daily', uid=edudaily.id) }}" role="button">続きを読む</a>
+  </p>
+</div>
+{% else %}
+  <p>投稿がありません</p>
+{% endfor %}
+{% endblock %}

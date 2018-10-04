@@ -1,0 +1,18 @@
+[Unit]
+Description = HISUCON2018 PORTAL
+
+[Service]
+WorkingDirectory=/srv/webapp/
+
+User=root
+Group=root
+ExecStart = /usr/bin/go run /srv/webapp/main.go
+ExecStop = systemctl kill -s9 $MAINPID
+ExecReload = /bin/kill -HUP $MAINPID && /usr/bin/go run /srv/webapp/main.go
+
+Restart = always
+
+Type = simple
+
+[Install]
+WantedBy = multi-user.target

@@ -1,0 +1,30 @@
+{{ define "result" }}
+<table class="striped">
+  <thead>
+    <tr>
+      <th>成功 / 失敗</th>
+      <th>スコア</th>
+      <th>メッセージ</th>
+      <th>ベンチマーク実行時間</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{ range $k, $v := .results }}
+    <tr>
+      {{ if $v.Result }}
+      <td style="background-color: greenyellow;" class="collapsible-header">
+        <i class="material-icons">thumb_up</i>
+      </td>
+      {{ else }}
+      <td style="background-color: crimson;" class="collapsible-header">
+        <i class="material-icons">thumb_down</i>
+      </td>
+      {{ end }}
+      <td>{{ $v.Score }}</td>
+      <td>{{ $v.Message }}</td>
+      <td>{{ $v.StartTime }}</td>
+  {{ end }}
+    </tr>
+   </tbody>
+</table>
+{{ end }}

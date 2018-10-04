@@ -1,0 +1,19 @@
+[Unit]
+Description = HISUCON2018 Bench
+
+[Service]
+LimitNOFILE=65536
+WorkingDirectory=/srv/bench/
+
+User=root
+Group=root
+ExecStart = /usr/bin/go run /srv/bench/main.go
+ExecStop = systemctl kill -s9 $MAINPID
+ExecReload = /bin/kill -HUP $MAINPID && /usr/bin/go run /srv/bench/main.go
+
+Restart = always
+
+Type = simple
+
+[Install]
+WantedBy = multi-user.target

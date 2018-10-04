@@ -1,0 +1,81 @@
+---
+- name: set fastestmirror only JP
+  lineinfile:
+    dest=/etc/yum/pluginconf.d/fastestmirror.conf
+    backup=true
+    state=present
+    line={{ item }}
+  with_items:
+    - 'include_only=.jp'
+
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: present
+
+- name: update all packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: install base packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "@Base"
+    - "@Compatibility libraries"
+    - "@Additional Development"
+    - "@Development tools"
+    - "@System administration tools"
+    - "@System Management"
+
+- name: install other packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - bind-utils
+    - dstat
+    - ftp
+    - git
+    - jq
+    - jwhois
+    - lsof
+    - mailx
+    - man
+    - psacct
+    - sysstat
+    - tcpdump
+    - telnet
+    - tmux
+    - nmap
+    - vim
+    - wget
+    - yum-plugin-fastestmirror
+
+- name: set PS1 at /etc/bashrc
+  lineinfile:
+    dest=/etc/bashrc
+    backup=true
+    state=present
+    line={{ item }}
+  with_items:
+    - 'PS1="\[\e[37m\e[44m\[HISUCON2018-PORTAL[\u@\h \W \d \t]\[\e[0m\]\n\\$ "'
+
+- name: disable SELinux
+  selinux:
+    state: disabled
+
+- name: set timezone to Asia/Tokyo
+  timezone:
+    name: Asia/Tokyo
+
+- name: copy ifcfg-eth1
+  copy:
+    src: "ifcfg-eth1"
+    dest: "/etc/sysconfig/network-scripts/"
+    owner: root
+    group: root
+
+# vim:ft=ansible:

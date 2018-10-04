@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% block page_content %}
+<form action="{{ url_for('useredit_admin', id=user.id) }}" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+        <label>ユーザ名
+            <br>※ 日本語不可</label>
+        <input id="username" type="text" pattern="^([a-zA-Z0-9]{6,})$" class="form-control" name="username" readonly="readonly" value="{{ user.name }}">
+    </div>
+    <div class="form-group">
+        <label>パスワード
+            <br>※ 8 文字以上 24 文字以下 </label>
+        <input id="password" type="password" name="password" class="form-control" minlength="8" maxlength="24" value="{{ user.password }}"
+            required>
+        <br>
+    </div>
+    <div class="form-group">
+        <label>管理者権限</label>
+        {% if user.get_admin() == 1 %}
+        <input id="is_admin" type="checkbox" class="form-control" name="is_admin" value="is_admin" checked="checked"> {% else %}
+        <input id="is_admin" type="checkbox" class="form-control" name="is_admin" value="is_admin"> {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>アイコン
+            <br>※ 指定しない場合には既存のアイコンが設定されます</label>
+        <input id="icon" type="file" class="form-control" accept=".jpg, .jpeg, .png" name="uploadicon" />
+    </div>
+
+    <button id="submit" type="submit" class="btn btn-primary">更新</button>
+</form>
+{% endblock %}

@@ -1,0 +1,20 @@
+---
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: present
+
+- name: install Redis
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - redis
+
+- name: start Redis and set auto start
+  systemd:
+    state: started
+    name: redis
+    enabled: yes
+
+# vim:ft=ansible:

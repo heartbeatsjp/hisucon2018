@@ -1,0 +1,2 @@
+users:
+  - { name: hisucon,  password: "{{ 'CHANGEME'|password_hash('sha512') }}",  authorizedkey: "CHANGEME" }

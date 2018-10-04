@@ -1,0 +1,9 @@
+{% extends "base.html" %} {% block page_content %}
+<form action="{{ url_for('new_com', id=edu_daily_id) }}" method="POST">
+    <div class="form-group">
+        <label>本文</label>
+        <textarea id="text" class="form-control" name=text rows="3"></textarea>
+    </div>
+    <button id="submit" type="submit" class="btn btn-primary">作成</button>
+</form>
+{% endblock %}

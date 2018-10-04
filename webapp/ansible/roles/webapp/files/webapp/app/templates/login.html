@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block page_content %}
+<h1>ログイン</h1>
+<form action="{{ url_for('login') }}" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.name.label }}<br>
+        {{ form.name(size=20) }}
+    </p>
+    <p>
+        {{ form.password.label }}<br>
+        {{ form.password(size=20) }}
+    </p>
+    <p>
+        {{ form.remember_me() }} {{ form.remember_me.label }}
+    </p>
+    <p>
+        {{ form.submit() }}
+    </p>
+</form>
+{% endblock %}

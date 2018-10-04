@@ -1,0 +1,45 @@
+---
+- name: mkdir ~/go
+  file:
+    path: "/root/go"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: check install golang
+  shell: which go
+  register: go_install
+  failed_when: go_install.rc not in [0, 1]
+
+- name: install golang
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - go
+
+- name: setup golang
+  lineinfile:
+    dest=~/.bashrc
+    backup=true
+    state=present
+    line={{ item }}
+  with_items:
+    - 'export GOPATH=$HOME/go'
+    - 'export PATH=$PATH:$GOPATH/bin'
+  when: go_install.rc == 1
+
+- name: install go packages
+  shell: |-
+    source ~/.bashrc
+    go get -u {{ item }}
+  with_items:
+    - github.com/gin-gonic/gin
+    - github.com/go-sql-driver/mysql
+    - github.com/jinzhu/gorm
+    - github.com/go-redis/redis
+    - github.com/benmanns/goworker
+    - github.com/constabulary/gb/...
+
+# vim:ft=ansible:

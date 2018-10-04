@@ -1,0 +1,92 @@
+{% extends "base.html" %} {% block page_content %}
+<h1>ユーザ一覧</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">ユーザ名</th>
+      <th scope="col">管理者</th>
+      <th scope="col">作成日</th>
+      <th scope="col">更新日</th>
+      <th scope="col">更新</th>
+    </tr>
+  </thead>
+  {% for user in users %}
+  <tbody>
+    {% if user.is_deleted %}
+    <tr class="table-secondary">
+      {% else %}
+      <tr>
+        {% endif %}
+        <td>
+          <img class="rounded-circle float-left" src="/static/{{ user.icon }}" alt="{{ user.icon }}" style='padding:0;margin:0 15px 15px 0;'
+            width="80" height="80"> {{ user.name }}
+        </td>
+        {% if user.is_admin == 1 %}
+        <td>◯</td>
+        {% else %}
+        <td>☓</td>
+        {% endif %}
+        <td>{{ user.created_at }}</td>
+        <td>{{ user.updated_at }}</td>
+        <td>
+          {% if not user.is_deleted %}
+          <p>
+            <a class="btn btn-primary" href="{{ url_for('useredit_admin', id=user.id) }}" role="button">編集</a>
+            <form action="{{ url_for('userdel_admin', username=user.name) }}" method="POST">
+              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#{{ user.id }}">削除</button>
+              <div class="modal fade" id="{{ user.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">確認</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      本当に削除しますか？
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                      <button type="submit" class="btn btn-danger" style="margin-left: 5px">削除</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+            {% else %}
+            <form action="{{ url_for('userback_admin', username=user.name) }}" method="POST">
+              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#{{ user.id }}">戻す</button>
+              <div class="modal fade" id="{{ user.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">確認</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      本当に戻しますか？
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                      <button type="submit" class="btn btn-info" style="margin-left: 5px">戻す</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </p>
+          {% endif %}
+        </td>
+      </tr>
+  </tbody>
+  {% endfor %}
+</table>
+
+<h1>ユーザ追加</h1>
+<hr class="my-4">
+<a class="btn btn-primary" href="{{ url_for('useradd') }}">ユーザ追加</a>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+---
+- name: install mysql repo
+  yum:
+    name: "{{ mysql_rpm }}"
+    state: present
+  
+- name: install mysqld
+  yum:
+    name: mysql-community-server
+    state: present
+
+- name: start mysqld and set auto start
+  systemd:
+    state: started
+    name: mysqld
+    enabled: yes
+
+- name: check alive
+  shell: mysqladmin -u root -p{{ mysql_root_pass }} ping | grep "mysqld is alive" 
+  register: result
+  failed_when: result.rc not in [0, 1]
+
+- name: get mysql default root password
+  shell: grep "A temporary password is generated" /var/log/mysqld.log | awk '{print $NF}' | tail -n1
+  register: mysql_default_password
+  when: result.rc == 1
+
+- name: change mysql default root password
+  shell: mysql -u root -p'{{ mysql_default_password.stdout }}' --connect-expired-password -e "set password for root@localhost=password('{{ mysql_root_pass }}');"
+  when: result.rc == 1
+
+- name: install package for mysql_user module
+  yum: name={{ item }} state=present
+  with_items:
+    - MySQL-python
+
+- name: copy hisucon2018-portal.sql
+  copy: 
+    src: hisucon2018-portal.sql
+    dest: "/tmp/" 
+    owner: root
+    group: root
+
+- name: import file.sql similar to mysql -u <username> -p <password> < hostname.sql
+  mysql_db:
+    state: import
+    login_user: root
+    login_password: "{{ mysql_root_pass }}"
+    name: all
+    target: /tmp/hisucon2018-portal.sql
+
+- name: user add
+  mysql_user:
+    login_user: root
+    login_password: "{{ mysql_root_pass }}"
+    name: hisucon
+    password: "{{ mysql_hisucon_pass }}"
+    priv: 'hisucon2018_portal.*:ALL'
+    state: present
+
+# vim:ft=ansible:

@@ -1,0 +1,107 @@
+---
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: present
+
+- name: install python3 rpm
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - https://centos7.iuscommunity.org/ius-release.rpm
+
+- name: install python3
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python36u
+    - python36u-libs
+    - python36u-devel
+    - python36u-pip
+
+- name: install pipenv
+  shell: |-
+    /bin/pip3.6 install pipenv
+
+- name: copy webapp
+  synchronize:
+    src: webapp
+    dest: "{{ webapp }}"
+  notify:
+    restart hisucon2018-webapp
+
+- name: copy static_org.zip, edu_daily_org.zip
+  copy:
+    src: "{{ item }}"
+    dest: "/tmp/{{ item }}"
+  with_items:
+    - edu_daily_org.zip
+    - static_org.zip
+
+- name: unarchive static_org.zip, edu_daily_org.zip
+  unarchive:
+    src: "/tmp/{{ item }}"
+    dest: "{{ webapp }}/webapp/app/"
+    remote_src: yes
+  with_items:
+    - edu_daily_org.zip
+    - static_org.zip
+
+- name: synchronize static_org:static
+  synchronize:
+    src: "{{ webapp }}/webapp/app/static_org/"
+    dest: "{{ webapp }}/webapp/app/static"
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: synchronize static_org:static
+  synchronize:
+    src: "{{ webapp }}/webapp/app/edu_daily_org/"
+    dest: "{{ webapp }}/webapp/app/edu_daily"
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: change owner:group
+  file:
+    path: "{{ webapp }}"
+    state: directory
+    recurse: yes
+    owner: "{{ appuser }}"
+    group: "{{ appuser }}"
+
+- name: install package
+  become_user: "{{ appuser }}"
+  shell: |-
+    cd "{{ webapp }}/webapp/"
+    pipenv --python /bin/python3.6
+    pipenv install
+
+- name: get gunicorn path
+  find:
+    paths: "{{ webapp }}"
+    recurse: yes
+    file_type: file
+    patterns: "gunicorn"
+    excludes: "site-packages"
+  register: gunicorn
+
+- name: set gunicorn path
+  set_fact: 
+    gunicorn_path: "{{ gunicorn.files[0].path }}"
+
+- name: copy systemd file
+  template: 
+    src: hisucon2018-webapp.service.j2
+    dest: /etc/systemd/system/hisucon2018-webapp.service
+    owner: root
+    group: root
+  notify:
+    restart hisucon2018-webapp
+
+- name: start hisucon2018-webapp.service and set auto start
+  systemd:
+    state: started
+    name: hisucon2018-webapp.service
+    enabled: yes
+
+# vim:ft=ansible:

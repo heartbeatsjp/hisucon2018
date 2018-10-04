@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <title>HISUCON2018 ポータル画面</title>
+    <meta charset="utf-8">
+    <meta http-equiv=refresh content='10'>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
+  </head>
+  <body class = "container">
+    <h5>HISUCON2018 ポータル画面</h5>
+    <ul class="collection with-header" style="font-size:80%;">
+        <li class="collection-header">注意事項</li>
+        <li class="collection-item">業務影響と健康に留意し競技を楽しんでください。</li>
+        <li class="collection-item">他のチームへの迷惑行為は絶対にしないでください。</li>
+        <li class="collection-item">チーム名は決められたチーム名、ローカル IP アドレスを指定してください。</li>
+        <li class="collection-item">ベンチマーク実行後はキューに入るため、同時実行数が多い場合には結果が反映されるまでに時間がかかります。</li>
+        <li class="collection-item">結果反映が分かるように、ポータル画面は 10 秒ごとに画面を reload してます</li> 
+    </ul>
+    <a id="test" class="waves-effect waves-light btn-large"><i class="material-icons left">cloud</i>ベンチマーク実行</a>
+    <h4>結果履歴</h4>
+    <div>{{ template "result" . }}</div>
+    {{ template "ajax" . }}
+    <br />
+  </body>
+</html>

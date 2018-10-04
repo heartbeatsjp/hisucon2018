@@ -1,0 +1,36 @@
+---
+- name: copy systemd
+  copy:
+    src: hisucon2018-bench.service
+    dest: "/etc/systemd/system/"
+  notify:
+    restart hisucon2018-bench
+
+- name: copy bench
+  synchronize:
+    src: bench
+    dest: "/srv/"
+  notify:
+    restart hisucon2018-bench
+
+- name: execute make
+  shell: |-
+    cd /srv/bench/
+    gb vendor restore
+    make
+
+- name: mkdir /srv/bench/logs
+  file:
+    path: "/srv/bench/logs"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: start hisucon2018-bench.service and set auto start
+  systemd:
+    state: started
+    name: hisucon2018-bench.service
+    enabled: yes
+
+# vim:ft=ansible:

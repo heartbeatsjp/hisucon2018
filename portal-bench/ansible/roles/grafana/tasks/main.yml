@@ -1,0 +1,22 @@
+---
+- name: install grafana
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ grafana_url }}"
+
+- name: start grafana and set auto start
+  systemd:
+    state: started
+    name: grafana-server
+    enabled: yes
+
+- name: FW 
+  firewalld:
+    port: 3000/tcp
+    permanent: true
+    immediate: true
+    state: enabled
+
+# vim:ft=ansible:

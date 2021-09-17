@@ -1,4 +1,4 @@
-# HISUCON2018
+# H-ISUCON2018
 
 ## 概要
 
